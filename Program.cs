@@ -1,3 +1,5 @@
+using MySqlConnector;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // CORS
@@ -59,6 +61,35 @@ app.MapGet("/weatherforecast", () =>
 })
 .WithName("GetWeatherForecast")
 .WithOpenApi();
+
+app.MapGet("/medicos", async () =>
+{
+    var connStr = Environment.GetEnvironmentVariable("MYSQL_CONN");
+
+    var medicos = new List<object>();
+
+    using var conn = new MySqlConnection(connStr);
+    await conn.OpenAsync();
+
+    var cmd = new MySqlCommand("SELECT * FROM medicos", conn);
+    using var reader = await cmd.ExecuteReaderAsync();
+
+    while (await reader.ReadAsync())
+    {
+        medicos.Add(new
+        {
+            id = reader["id"],
+            nombre = reader["nombre"],
+            apellido = reader["apellido"],
+            especialidad = reader["especialidad"],
+            matricula = reader["matricula"],
+            telefono = reader["telefono"],
+            email = reader["email"]
+        });
+    }
+
+    return Results.Ok(medicos);
+});
 
 app.Run();
 
