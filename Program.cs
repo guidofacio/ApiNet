@@ -9,7 +9,8 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(
                 "http://localhost:5173",
-                "https://tu-frontend.onrender.com"
+                "https://tu-frontend.onrender.com",
+                "https://royalblue-salmon-267723.hostingersite.com"
             )
             .AllowAnyHeader()
             .AllowAnyMethod();
