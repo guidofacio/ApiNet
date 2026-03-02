@@ -92,6 +92,33 @@ app.MapGet("/medicos", async () =>
     return Results.Ok(medicos);
 });
 
+app.MapGet("/obtenerarchivos", async () =>
+{
+    var connStr = Environment.GetEnvironmentVariable("MYSQL_CONN");
+
+    if (string.IsNullOrWhiteSpace(connStr))
+        return Results.Problem("Falta la variable de entorno MYSQL_CONN");
+
+    var archivos = new List<object>();
+
+    using var conn = new MySqlConnection(connStr);
+    await conn.OpenAsync();
+
+    var cmd = new MySqlCommand("SELECT idarchivo, nombre_real FROM archivos", conn);
+    using var reader = await cmd.ExecuteReaderAsync();
+
+    while (await reader.ReadAsync())
+    {
+        archivos.Add(new
+        {
+            idarchivo = reader["idarchivo"],
+            nombre_real = reader["nombre_real"]
+        });
+    }
+
+    return Results.Ok(archivos);
+});
+
 app.Run();
 
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
